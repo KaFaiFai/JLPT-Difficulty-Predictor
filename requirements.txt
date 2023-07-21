@@ -1,0 +1,6 @@
+beautifulsoup4
+cloudscraper
+pandas
+konoha
+sudachipy
+sudachidict_core
