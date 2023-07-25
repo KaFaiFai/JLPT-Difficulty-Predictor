@@ -1,23 +1,28 @@
 import torch
-from  torch import nn
+from torch import nn
 from transformers import AutoModel, AutoTokenizer, BertModel
 
+
 class BERTClassification(nn.Module):
-    def __init__(self, num_class=6):
+    def __init__(self, num_class):
         super().__init__()
-        self.bert:BertModel = AutoModel.from_pretrained("cl-tohoku/bert-base-japanese")
+        self.bert: BertModel = AutoModel.from_pretrained("cl-tohoku/bert-base-japanese")
+        for param in self.bert.parameters():
+            param.requires_grad = False
         self.classifier = nn.Sequential(
-nn.Dropout(0.3),nn.Linear(768, 768),nn.Dropout(0.3),nn.Linear(768, num_class),
+            nn.Dropout(0.5),
+            nn.Linear(768, 768),
+            nn.Dropout(0.5),
+            nn.Linear(768, num_class),
         )
-    
+
     def forward(self, input_ids, attn_mask, token_type_ids):
         output = self.bert(
-            input_ids, 
-            attention_mask=attn_mask, 
-            token_type_ids=token_type_ids
+            input_ids, attention_mask=attn_mask, token_type_ids=token_type_ids
         )
         output = self.classifier(output.pooler_output)
         return output
+
 
 def test():
     from torchinfo import summary
@@ -28,9 +33,8 @@ def test():
     line = "吾輩は猫である。"
     line2 = "国家公務員"
     tokenizer = AutoTokenizer.from_pretrained("cl-tohoku/bert-base-japanese")
-    inputs = tokenizer([line,line2], return_tensors="pt", padding="max_length")
+    inputs = tokenizer([line, line2], return_tensors="pt", padding="max_length")
     summary(net, **inputs)
-
 
     # network_state = net.state_dict()
     # print("PyTorch model's state_dict:")
