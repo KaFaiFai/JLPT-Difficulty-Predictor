@@ -10,15 +10,15 @@ class BERTClassification(nn.Module):
         for param in self.bert.parameters():
             param.requires_grad = False
         self.classifier = nn.Sequential(
-            nn.Dropout(0.5),
-            nn.Linear(768, 768),
-            nn.Dropout(0.5),
+            # nn.Dropout(0.5),
+            # nn.Linear(768, 768),
+            nn.Dropout(0.3),
             nn.Linear(768, num_class),
         )
 
-    def forward(self, input_ids, attn_mask, token_type_ids):
+    def forward(self, input_ids, attention_mask, token_type_ids):
         output = self.bert(
-            input_ids, attention_mask=attn_mask, token_type_ids=token_type_ids
+            input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids
         )
         output = self.classifier(output.pooler_output)
         return output
