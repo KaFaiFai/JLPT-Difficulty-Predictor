@@ -17,9 +17,7 @@ class BERTClassification(nn.Module):
         )
 
     def forward(self, input_ids, attention_mask, token_type_ids):
-        output = self.bert(
-            input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids
-        )
+        output = self.bert(input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
         output = self.classifier(output.pooler_output)
         return output
 
@@ -33,9 +31,13 @@ def test():
     line = "吾輩は猫である。"
     line2 = "国家公務員"
     tokenizer = AutoTokenizer.from_pretrained("cl-tohoku/bert-base-japanese")
-    inputs = tokenizer([line, line2], return_tensors="pt", padding="max_length")
+    inputs = tokenizer([line, line2], return_tensors="pt", padding="max_length").to(device)
     summary(net, **inputs)
 
+    out = net(**inputs)
+    print(out.shape)
+
+    print(net)
     # network_state = net.state_dict()
     # print("PyTorch model's state_dict:")
     # for layer, tensor in network_state.items():
