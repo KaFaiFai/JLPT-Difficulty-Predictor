@@ -4,3 +4,13 @@ pandas
 konoha
 sudachipy
 sudachidict_core
+torch
+torchvision
+torchaudio
+transformers
+torchinfo
+pandas
+scikit-learn
+fugashi
+ipadic
+matplotlib
