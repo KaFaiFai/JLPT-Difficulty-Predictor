@@ -10,11 +10,11 @@ class SimpleAttention(nn.Module):
         super().__init__()
         self.embedding = nn.Embedding(vocab_size, embedding_size)
         self.lstm = nn.LSTM(embedding_size, hidden_size, bidirectional=True, batch_first=True)
-        self.attention = nn.MultiheadAttention(hidden_size * 2, num_heads=1)
+        self.attention = nn.MultiheadAttention(hidden_size * 2, num_heads=1, batch_first=True)
         self.dropout = nn.Dropout(p=0.5)
         self.fc = nn.Linear(hidden_size * 2, num_class)
 
-    def forward(self, input_ids, **kwargs):
+    def forward(self, input_ids, attention_mask, **kwargs):
         # (B, seq_len) -> (B, num_calss)
 
         # Embedding layer
@@ -29,14 +29,11 @@ class SimpleAttention(nn.Module):
         # Attention layer: self-attention
         # (B, seq_len, hidden_size * 2) -> (B, hidden_size * 2)
         attention_output, _ = self.attention(
-            lstm_output.transpose(0, 1),
-            lstm_output.transpose(0, 1),
-            lstm_output.transpose(0, 1),
+            lstm_output, lstm_output, lstm_output, key_padding_mask=attention_mask == 0
         )
-        attention_output = attention_output[0]
 
         # Dropout layer
-        dropout_output = self.dropout(attention_output)
+        dropout_output = self.dropout(attention_output[:, 0, ...])
 
         # Fully connected layer
         # (B, hidden_size * 2) -> (B, num_calss)
@@ -56,9 +53,9 @@ def test():
     inputs = tokenizer([line, line2], return_tensors="pt", padding="max_length").to(device)
     print(f"{len(tokenizer)=}")
 
-    summary(net, input_data=inputs["input_ids"])
+    summary(net, **inputs)
 
-    out = net(inputs["input_ids"])
+    out = net(**inputs)
     # network_state = net.state_dict()
     # print("PyTorch model's state_dict:")
     # for layer, tensor in network_state.items():
