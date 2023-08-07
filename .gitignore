@@ -1,4 +1,5 @@
-**/*.csv
+training_data/
+resource/
 .vscode
 
 # Byte-compiled / optimized / DLL files
