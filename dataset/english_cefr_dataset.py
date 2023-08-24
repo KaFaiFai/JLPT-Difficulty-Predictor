@@ -1,3 +1,9 @@
+"""
+Source: https://www.kaggle.com/datasets/amontgomerie/cefr-levelled-english-texts  
+download it and put in `training_data/cefr_leveled_texts.csv`
+"""
+
+
 import pandas as pd
 from torch.utils.data import Dataset
 
@@ -13,8 +19,8 @@ class EnglishCEFRDataset(Dataset):
         return len(self.df)
 
     def __getitem__(self, index) -> tuple[str, int]:
-        sentence = self.df["Sentence"][index]
-        level = self.df["Level"][index]
+        sentence = self.df["text"][index]
+        level = self.df["label"][index]
         label = self.level2target(level)
 
         return sentence, label
@@ -26,3 +32,13 @@ class EnglishCEFRDataset(Dataset):
     @classmethod
     def target2level(cls, target):
         return cls.LEVELS[target]
+
+
+def _test():
+    dataset = EnglishCEFRDataset("training_data/cefr_leveled_texts.csv")
+    print(dataset.df.keys())
+    print(dataset[0])
+
+
+if __name__ == "__main__":
+    _test()
