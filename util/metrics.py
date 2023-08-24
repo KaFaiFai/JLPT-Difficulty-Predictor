@@ -1,6 +1,7 @@
 import numpy as np
 import sklearn.metrics
 
+
 class ClassificationMetrics:
     def __init__(self, truths, outputs):
         """
@@ -26,5 +27,5 @@ class ClassificationMetrics:
             print(f"Recall:   {recall:.4f} | F1 score:  {f1_score:.4f}")
         else:
             topK_accuracy = sklearn.metrics.top_k_accuracy_score(self.truths, self._outputs, k=topK)
-            print(f"Top 1 Accuracy: {accuracy:2.2%} | Top 5 Accuracy: {topK_accuracy:2.2%}")
+            print(f"Top 1 Accuracy: {accuracy:2.2%} | Top {topK} Accuracy: {topK_accuracy:2.2%}")
             print(f"Precision: {precision:.4f} | Recall: {recall:.4f} | F1 score: {f1_score:.4f}")
