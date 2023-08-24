@@ -13,7 +13,17 @@ class EnglishCEFRDataset(Dataset):
 
     def __init__(self, df_path):
         super().__init__()
-        self.df = pd.read_csv(df_path)
+        df = pd.read_csv(df_path)
+
+        # process df
+        df["text"] = df["text"].str.replace("\n", "")
+        df["text"] = df["text"].str.split("[.!?]")
+        df = df.explode("text")
+        df = df.reset_index(drop=True)
+        df = df.drop(df[df["text"].map(len) < 20].index)
+        df = df.reset_index(drop=True)
+
+        self.df = df
 
     def __len__(self):
         return len(self.df)
