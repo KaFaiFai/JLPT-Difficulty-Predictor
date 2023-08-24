@@ -13,7 +13,7 @@ class EnglishCEFRDataset(Dataset):
 
     def __init__(self, df_path):
         super().__init__()
-        self.df = pd.read_csv(df_path, index_col=0)
+        self.df = pd.read_csv(df_path)
 
     def __len__(self):
         return len(self.df)
