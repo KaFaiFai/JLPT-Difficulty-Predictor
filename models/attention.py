@@ -14,9 +14,9 @@ class SimpleAttention(nn.Module):
         super().__init__()
         self.embedding = nn.Embedding(vocab_size, embedding_size)
         self.lstm = nn.LSTM(embedding_size, hidden_size, bidirectional=True, batch_first=True)
-        self.relu = nn.PReLU()
+        self.relu = nn.ReLU()
         self.attention = nn.MultiheadAttention(hidden_size * 2, num_heads=1, batch_first=True)
-        # self.dropout = nn.Dropout(p=0.5)
+        self.dropout = nn.Dropout(p=0.5)
         self.fc = nn.Linear(hidden_size * 2, num_class)
 
     def forward(self, input_ids, attention_mask, **kwargs):

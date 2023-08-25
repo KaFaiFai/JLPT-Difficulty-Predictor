@@ -6,13 +6,13 @@ from transformers import AutoModel, AutoTokenizer, BertModel
 class BERTClassification(nn.Module):
     def __init__(self, num_class):
         super().__init__()
-        self.bert: BertModel = AutoModel.from_pretrained("bert-base-cased")
+        self.bert: BertModel = AutoModel.from_pretrained("bert-base-uncased")
         for param in self.bert.parameters():
             param.requires_grad = False
         self.classifier = nn.Sequential(
-            # nn.Dropout(0.5),
-            # nn.Linear(768, 768),
-            nn.Dropout(0.3),
+            nn.Linear(768, 768),
+            nn.ReLU(),
+            nn.Dropout(),
             nn.Linear(768, num_class),
         )
 
@@ -26,12 +26,14 @@ def test():
     from torchinfo import summary
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    net = BERTClassification(5).to(device)
+    net = BERTClassification(6).to(device)
 
-    line = "吾輩は猫である。"
-    line2 = "国家公務員"
-    tokenizer = AutoTokenizer.from_pretrained("cl-tohoku/bert-base-japanese")
-    inputs = tokenizer([line, line2], return_tensors="pt", padding="max_length").to(device)
+    sentences = [
+        "This is the first sentences",
+        "I've been meaning to write for ages and finally today",
+    ]
+    tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
+    inputs = tokenizer(sentences, return_tensors="pt", padding=True).to(device)
     summary(net, **inputs)
 
     out = net(**inputs)
