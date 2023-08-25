@@ -14,8 +14,9 @@ class SimpleAttention(nn.Module):
         super().__init__()
         self.embedding = nn.Embedding(vocab_size, embedding_size)
         self.lstm = nn.LSTM(embedding_size, hidden_size, bidirectional=True, batch_first=True)
+        self.relu = nn.PReLU()
         self.attention = nn.MultiheadAttention(hidden_size * 2, num_heads=1, batch_first=True)
-        self.dropout = nn.Dropout(p=0.5)
+        # self.dropout = nn.Dropout(p=0.5)
         self.fc = nn.Linear(hidden_size * 2, num_class)
 
     def forward(self, input_ids, attention_mask, **kwargs):
@@ -23,32 +24,36 @@ class SimpleAttention(nn.Module):
 
         # Embedding layer
         # (B, seq_len) -> (B, seq_len, embed_size)
-        embedded = self.embedding(input_ids)
+        out = self.embedding(input_ids)
 
         # LSTM layer
         # (B, seq_len, embed_size) -> (B, seq_len, hidden_size * 2) for bidirectional
-        lstm_output, _ = self.lstm(embedded)
+        out, _ = self.lstm(out)
+
+        # Relu layer
+        # (B, seq_len, hidden_size * 2) -> (B, seq_len, hidden_size * 2)
+        # out = self.relu(out)
 
         # Attention layer: self-attention
         # (B, seq_len, hidden_size * 2) -> (B, seq_len, hidden_size * 2)
-        attention_output, _ = self.attention(
-            lstm_output, lstm_output, lstm_output, key_padding_mask=attention_mask == 0
-        )
+        out, _ = self.attention(out, out, out, key_padding_mask=attention_mask == 0)
+        out = out[:, 0, ...]
 
         # Dropout layer
         # (B, seq_len, hidden_size * 2) -> (B, hidden_size * 2)
-        dropout_output = self.dropout(attention_output[:, 0, ...])
+        # out = self.dropout(out)
 
         # Fully connected layer
         # (B, hidden_size * 2) -> (B, num_calss)
-        fc_output = self.fc(dropout_output)
-        return fc_output
+        out = self.fc(out)
+        return out
 
     def get_attention_output(self, input_ids, attention_mask, **kwargs):
         # (B, seq_len), (B, seq_len) -> (seq_len, B, hidden_size*2), (B, hidden_size*2, hidden_size*2)
 
         embedded = self.embedding(input_ids)
         lstm_output, _ = self.lstm(embedded)
+        relu_output = self.relu(lstm_output)
         mask = attention_mask == 0
         attention_output, attention_output_weights = self.attention(
             lstm_output, lstm_output, lstm_output, key_padding_mask=mask

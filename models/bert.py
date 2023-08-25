@@ -6,7 +6,7 @@ from transformers import AutoModel, AutoTokenizer, BertModel
 class BERTClassification(nn.Module):
     def __init__(self, num_class):
         super().__init__()
-        self.bert: BertModel = AutoModel.from_pretrained("cl-tohoku/bert-base-japanese")
+        self.bert: BertModel = AutoModel.from_pretrained("bert-base-cased")
         for param in self.bert.parameters():
             param.requires_grad = False
         self.classifier = nn.Sequential(
