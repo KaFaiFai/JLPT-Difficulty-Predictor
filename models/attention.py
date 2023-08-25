@@ -25,7 +25,6 @@ class SimpleAttention(nn.Module):
         # (B, seq_len, embed_size) -> (B, seq_len, hidden_size * 2) for bidirectional
         lstm_output, _ = self.lstm(embedded)
 
-        # TODO: add attention mask
         # Attention layer: self-attention
         # (B, seq_len, hidden_size * 2) -> (B, hidden_size * 2)
         attention_output, _ = self.attention(
