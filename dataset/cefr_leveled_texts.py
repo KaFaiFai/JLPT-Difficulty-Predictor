@@ -8,7 +8,7 @@ import pandas as pd
 from torch.utils.data import Dataset
 
 
-class EnglishCEFRDataset(Dataset):
+class CEFRLeveledTexts(Dataset):
     LEVELS = ("A1", "A2", "B1", "B2", "C1", "C2")
 
     def __init__(self, df_path):
@@ -45,7 +45,7 @@ class EnglishCEFRDataset(Dataset):
 
 
 def _test():
-    dataset = EnglishCEFRDataset("training_data/cefr_leveled_texts.csv")
+    dataset = CEFRLeveledTexts("training_data/cefr_leveled_texts.csv")
     print(dataset.df.keys())
     print(dataset[0])
 
