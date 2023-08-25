@@ -31,16 +31,16 @@ class CEFRLeveledTexts(Dataset):
     def __getitem__(self, index) -> tuple[str, int]:
         sentence = self.df["text"][index]
         level = self.df["label"][index]
-        label = self.level2target(level)
+        label = self.label2target(level)
 
         return sentence, label
 
     @classmethod
-    def level2target(cls, level):
-        return cls.LEVELS.index(level)
+    def label2target(cls, label):
+        return cls.LEVELS.index(label)
 
     @classmethod
-    def target2level(cls, target):
+    def target2label(cls, target):
         return cls.LEVELS[target]
 
 
