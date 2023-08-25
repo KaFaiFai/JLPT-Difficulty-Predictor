@@ -16,11 +16,11 @@ class EnglishCEFRDataset(Dataset):
         df = pd.read_csv(df_path)
 
         # process df
-        df["text"] = df["text"].str.replace("\n", "")
-        df["text"] = df["text"].str.split("[.!?]")
-        df = df.explode("text")
+        df["text"] = df["text"].str.replace("\n", "")  # remove newline
+        df["text"] = df["text"].str.split("[.!?]")  # split paragraphs to sentences
+        df = df.explode("text")  # make each sentence its own row
         df = df.reset_index(drop=True)
-        df = df.drop(df[df["text"].map(len) < 20].index)
+        df = df.drop(df[df["text"].map(len) < 20].index)  # remove sentences that are short
         df = df.reset_index(drop=True)
 
         self.df = df
