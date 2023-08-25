@@ -26,12 +26,13 @@ class SimpleAttention(nn.Module):
         lstm_output, _ = self.lstm(embedded)
 
         # Attention layer: self-attention
-        # (B, seq_len, hidden_size * 2) -> (B, hidden_size * 2)
+        # (B, seq_len, hidden_size * 2) -> (B, seq_len, hidden_size * 2)
         attention_output, _ = self.attention(
             lstm_output, lstm_output, lstm_output, key_padding_mask=attention_mask == 0
         )
 
         # Dropout layer
+        # (B, seq_len, hidden_size * 2) -> (B, hidden_size * 2)
         dropout_output = self.dropout(attention_output[:, 0, ...])
 
         # Fully connected layer
