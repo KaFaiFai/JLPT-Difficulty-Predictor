@@ -91,7 +91,7 @@ class NewsCategory(Dataset):
         df = pd.read_json(df_path, lines=True)
         df["news"] = df["headline"] + " " + df["short_description"]
         df = df[["category", "news"]]
-        df["news"] = df["news"].apply(clean_text)
+        # df["news"] = df["news"].apply(clean_text)
 
         self.df = df
 
