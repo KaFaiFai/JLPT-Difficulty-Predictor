@@ -119,6 +119,7 @@ def _test():
     print(dataset.df.keys())
     print(dataset.df.shape)
     print(dataset.df.head())
+    print(len(dataset.LABELS))
     print(dataset[0])
 
 
