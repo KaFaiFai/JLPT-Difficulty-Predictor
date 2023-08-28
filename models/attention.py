@@ -29,19 +29,17 @@ class SimpleAttention(nn.Module):
         # LSTM layer
         # (B, seq_len, embed_size) -> (B, seq_len, hidden_size * 2) for bidirectional
         out, _ = self.lstm(out)
-
-        # Relu layer
-        # (B, seq_len, hidden_size * 2) -> (B, seq_len, hidden_size * 2)
-        # out = self.relu(out)
+        out = self.relu(out)
 
         # Attention layer: self-attention
         # (B, seq_len, hidden_size * 2) -> (B, seq_len, hidden_size * 2)
         out, _ = self.attention(out, out, out, key_padding_mask=attention_mask == 0)
+        out = self.relu(out)
         out = out[:, 0, ...]
 
         # Dropout layer
         # (B, seq_len, hidden_size * 2) -> (B, hidden_size * 2)
-        # out = self.dropout(out)
+        out = self.dropout(out)
 
         # Fully connected layer
         # (B, hidden_size * 2) -> (B, num_calss)

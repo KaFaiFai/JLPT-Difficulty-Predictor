@@ -35,6 +35,7 @@ class SimpleAttention2(nn.Module):
         self.embedding = nn.Embedding(vocab_size, embedding_size)
         self.positional_embedding = PositionalEncoding(embedding_size)
         self.attention1 = nn.MultiheadAttention(embedding_size, num_heads=1, batch_first=True)
+        self.relu = nn.ReLU()
         self.attention2 = nn.MultiheadAttention(embedding_size, num_heads=2, batch_first=True)
         self.dropout = nn.Dropout(p=0.5)
         self.fc = nn.Linear(embedding_size, num_class)
@@ -44,29 +45,28 @@ class SimpleAttention2(nn.Module):
 
         # Embedding layer
         # (B, seq_len) -> (B, seq_len, embed_size)
-        embedded = self.embedding(input_ids)
-        embedded_pos = self.positional_embedding(embedded)
+        out = self.embedding(input_ids)
+        out = self.positional_embedding(out)
 
         # Attention layer 1: self-attention
         # (B, seq_len, embed_size) -> (B, seq_len, embed_size)
-        attention_output1, _ = self.attention1(
-            embedded_pos, embedded_pos, embedded_pos, key_padding_mask=attention_mask == 0
-        )
+        out, _ = self.attention1(out, out, out, key_padding_mask=attention_mask == 0)
+        out = self.relu(out)
 
         # Attention layer 2: self-attention
         # (B, seq_len, embed_size) -> (B, seq_len, embed_size)
-        attention_output2, _ = self.attention1(
-            attention_output1, attention_output1, attention_output1, key_padding_mask=attention_mask == 0
-        )
+        out, _ = self.attention2(out, out, out, key_padding_mask=attention_mask == 0)
+        out = self.relu(out)
+        out = out[:, 0, ...]
 
         # Dropout layer
         # (B, seq_len, hidden_size * 2) -> (B, hidden_size * 2)
-        dropout_output = self.dropout(attention_output2[:, 0, ...])
+        out = self.dropout(out)
 
         # Fully connected layer
         # (B, hidden_size * 2) -> (B, num_calss)
-        fc_output = self.fc(dropout_output)
-        return fc_output
+        out = self.fc(out)
+        return out
 
     def get_attention_output(self, input_ids, attention_mask, **kwargs):
         # (B, seq_len), (B, seq_len) -> (seq_len, B, hidden_size*2), (B, hidden_size*2, hidden_size*2)
